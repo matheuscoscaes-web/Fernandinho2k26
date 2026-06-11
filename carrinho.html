@@ -233,9 +233,9 @@ function abrirCheckout() {
 
 function fecharCheckout() { document.getElementById('modalCheckout').classList.remove('aberto'); }
 
-function confirmarPedido() {
+async function confirmarPedido() {
   const nome     = document.getElementById('ckNome').value.trim();
-  const telefone = document.getElementById('ckTelefone').value.trim();
+  const telefone = document.getElementById('ckTelefone').value.trim().replace(/\D/g, '');
   const endereco = document.getElementById('ckEndereco').value.trim();
   const obs      = document.getElementById('ckObs').value.trim();
 
@@ -244,29 +244,36 @@ function confirmarPedido() {
     return;
   }
 
-  const pedido = salvarPedido({ nome, telefone, endereco, obs }, _snapshotCarrinho, FRETE);
-  saveCarrinho([]);
-  atualizarBadgeCarrinho();
-  fecharCheckout();
+  // Desabilitar botão durante envio
+  const btnConfirmar = document.querySelector('#modalCheckout button[onclick="confirmarPedido()"]');
+  if (btnConfirmar) { btnConfirmar.disabled = true; btnConfirmar.textContent = '⏳ Enviando...'; }
 
-  // Montar link WhatsApp com detalhes
-  const linhasWa = pedido.itens.map(i => `• ${i.nome} ×${i.qtd} = ${formatarPreco(i.subtotal)}`).join('%0A');
-  const waText = encodeURIComponent(
-    `Olá! Fiz um pedido na Figurinha da Copa 2K26.\n\n` +
-    `📋 Pedido: ${pedido.id}\n` +
-    `👤 Nome: ${nome}\n` +
-    `📍 Endereço: ${endereco}\n\n` +
-    `Itens:\n` + pedido.itens.map(i => `• ${i.nome} ×${i.qtd} = ${formatarPreco(i.subtotal)}`).join('\n') + `\n\n` +
-    `💰 Total: ${formatarPreco(pedido.total)}`
-  );
+  try {
+    const pedido = await salvarPedido({ nome, telefone, endereco, obs }, _snapshotCarrinho, FRETE);
+    saveCarrinho([]);
+    atualizarBadgeCarrinho();
+    fecharCheckout();
 
-  document.getElementById('sucMsgNome').textContent = `Obrigado, ${nome}! Seu pedido foi registrado.`;
-  document.getElementById('sucNumero').textContent  = `Pedido #${pedido.id}`;
-  document.getElementById('sucWaLink').href = `https://wa.me/5511999999999?text=${waText}`;
-  document.getElementById('modalSucesso').classList.add('aberto');
+    const waText = encodeURIComponent(
+      `Olá! Fiz um pedido na Figurinha da Copa 2K26.\n\n` +
+      `📋 Pedido: ${pedido.id}\n` +
+      `👤 Nome: ${nome}\n` +
+      `📍 Endereço: ${endereco}\n\n` +
+      `Itens:\n` + pedido.itens.map(i => `• ${i.nome} ×${i.qtd} = ${formatarPreco(i.subtotal)}`).join('\n') + `\n\n` +
+      `💰 Total: ${formatarPreco(pedido.total)}`
+    );
 
-  // Limpar campos
-  ['ckNome','ckTelefone','ckEndereco','ckObs'].forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('sucMsgNome').textContent = `Obrigado, ${nome}! Seu pedido foi registrado.`;
+    document.getElementById('sucNumero').textContent  = `Pedido: ${pedido.id}`;
+    document.getElementById('sucWaLink').href = `https://wa.me/55${telefone}?text=${waText}`;
+    document.getElementById('modalSucesso').classList.add('aberto');
+
+    ['ckNome','ckTelefone','ckEndereco','ckObs'].forEach(id => { document.getElementById(id).value = ''; });
+  } catch(e) {
+    showToast('Erro ao registrar pedido. Tente novamente.', 'erro');
+  } finally {
+    if (btnConfirmar) { btnConfirmar.disabled = false; btnConfirmar.textContent = '✅ Confirmar Pedido'; }
+  }
 }
 
 function fecharSucesso() {
