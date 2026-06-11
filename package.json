@@ -1,0 +1,12 @@
+{
+  "name": "figurinha-copa-2k26",
+  "version": "1.0.0",
+  "description": "Site de venda de figurinhas da Copa do Mundo 2026",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
