@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Figurinha da Copa 2K26</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+</head>
+<body>
+
+<!-- TELA DE LOGIN -->
+<div id="loginOverlay" style="
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(135deg, #004d26 0%, #006633 60%, #003087 100%);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+">
+  <div style="
+    background: white; border-radius: 20px; padding: 40px 36px;
+    max-width: 400px; width: 100%; text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  ">
+    <div style="width:64px;height:64px;background:#FFD700;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 18px;">🔒</div>
+    <h2 style="font-size:1.3rem;font-weight:800;color:#004d26;margin-bottom:6px;">Painel Administrativo</h2>
+    <p style="font-size:0.88rem;color:#888;margin-bottom:28px;">Digite a senha para continuar</p>
+
+    <input type="password" id="loginSenha" placeholder="Senha" style="
+      width:100%; padding:13px 16px; border:2px solid #e0e0e0; border-radius:10px;
+      font-size:1rem; font-family:inherit; text-align:center; letter-spacing:4px;
+      transition:border-color 0.3s; margin-bottom:14px;
+    " onfocus="this.style.borderColor='#006633'" onblur="this.style.borderColor='#e0e0e0'"
+      onkeydown="if(event.key==='Enter') verificarSenha()">
+
+    <div id="loginErro" style="
+      color:#e53935; font-size:0.85rem; font-weight:600;
+      margin-bottom:12px; min-height:20px; display:none;
+    ">❌ Senha incorreta. Tente novamente.</div>
+
+    <button onclick="verificarSenha()" style="
+      width:100%; background:#006633; color:white; font-weight:800;
+      font-size:1rem; padding:14px; border-radius:10px; border:none;
+      cursor:pointer; transition:background 0.3s;
+    " onmouseover="this.style.background='#004d26'" onmouseout="this.style.background='#006633'">
+      Entrar
+    </button>
+
+    <p style="font-size:0.75rem;color:#bbb;margin-top:20px;">⚽ Figurinha da Copa 2K26</p>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">⚽</div>
+      <div class="logo-text">
+        <h1>Figurinha da Copa</h1>
+        <span>Painel Admin</span>
+      </div>
+    </a>
+    <nav id="navMenu">
+      <a href="index.html">Início</a>
+      <a href="catalogo.html">Catálogo</a>
+      <a href="gestao.html">📊 Gestão CRM</a>
+      <a href="carrinho.html" class="btn-carrinho">
+        🛒 Carrinho <span class="badge-carrinho">0</span>
+      </a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+      <button onclick="alterarSenha()" style="
+        padding:7px 14px; background:rgba(255,255,255,0.15); color:white;
+        border-radius:8px; font-size:0.8rem; font-weight:700; border:none; cursor:pointer;
+        transition:background 0.3s;
+      " onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+        🔑 Senha
+      </button>
+      <button onclick="sair()" style="
+        padding:7px 14px; background:#e53935; color:white;
+        border-radius:8px; font-size:0.8rem; font-weight:700; border:none; cursor:pointer;
+        transition:background 0.3s;
+      " onmouseover="this.style.background='#c62828'" onmouseout="this.style.background='#e53935'">
+        🚪 Sair
+      </button>
+    </div>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<section style="padding-top: 40px;">
+  <div class="section-header">
+    <h2>⚙️ Painel Administrativo</h2>
+    <p>Cadastre e gerencie as figurinhas do catálogo</p>
+    <div class="linha"></div>
+  </div>
+
+  <!-- STATS ADMIN -->
+  <div style="max-width:1100px;margin:0 auto 30px;display:flex;gap:14px;flex-wrap:wrap;">
+    <div style="background:white;border-radius:12px;padding:18px 24px;box-shadow:0 4px 20px rgba(0,0,0,0.08);flex:1;min-width:130px;text-align:center;">
+      <div style="font-size:1.6rem;font-weight:900;color:#006633;" id="admTotal">0</div>
+      <div style="font-size:0.78rem;color:#666;text-transform:uppercase;letter-spacing:0.5px">Total</div>
+    </div>
+    <div style="background:white;border-radius:12px;padding:18px 24px;box-shadow:0 4px 20px rgba(0,0,0,0.08);flex:1;min-width:130px;text-align:center;">
+      <div style="font-size:1.6rem;font-weight:900;color:#006633;" id="admDisponiveis">0</div>
+      <div style="font-size:0.78rem;color:#666;text-transform:uppercase;letter-spacing:0.5px">Disponíveis</div>
+    </div>
+    <div style="background:white;border-radius:12px;padding:18px 24px;box-shadow:0 4px 20px rgba(0,0,0,0.08);flex:1;min-width:130px;text-align:center;">
+      <div style="font-size:1.6rem;font-weight:900;color:#e53935;" id="admEsgotados">0</div>
+      <div style="font-size:0.78rem;color:#666;text-transform:uppercase;letter-spacing:0.5px">Esgotados</div>
+    </div>
+    <div style="background:white;border-radius:12px;padding:18px 24px;box-shadow:0 4px 20px rgba(0,0,0,0.08);flex:1;min-width:130px;text-align:center;">
+      <div style="font-size:1.6rem;font-weight:900;color:#006633;" id="admGrupos">0</div>
+      <div style="font-size:0.78rem;color:#666;text-transform:uppercase;letter-spacing:0.5px">Grupos</div>
+    </div>
+  </div>
+
+  <div class="admin-layout">
+    <!-- FORMULÁRIO -->
+    <div class="form-card">
+      <h3 id="formTitulo">➕ Nova Figurinha</h3>
+
+      <input type="hidden" id="editId">
+
+      <div class="form-row">
+        <div class="form-grupo">
+          <label>Número *</label>
+          <input type="number" id="fNumero" placeholder="Ex: 001" min="1" max="9999">
+        </div>
+        <div class="form-grupo">
+          <label>Grupo *</label>
+          <select id="fGrupo">
+            <option value="">Selecione...</option>
+            <option value="A">Grupo A</option>
+            <option value="B">Grupo B</option>
+            <option value="C">Grupo C</option>
+            <option value="D">Grupo D</option>
+            <option value="E">Grupo E</option>
+            <option value="F">Grupo F</option>
+            <option value="G">Grupo G</option>
+            <option value="H">Grupo H</option>
+            <option value="ESPECIAL">Especiais</option>
+            <option value="LENDAS">Lendas</option>
+            <option value="SELEÇÃO">Seleção Brasileira</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grupo">
+        <label>Nome do Jogador / Figurinha *</label>
+        <input type="text" id="fNome" placeholder="Ex: Lionel Messi">
+      </div>
+
+      <div class="form-grupo">
+        <label>Descrição</label>
+        <textarea id="fDescricao" placeholder="Ex: Argentina - Capitão da Seleção"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-grupo">
+          <label>Preço (R$) *</label>
+          <input type="number" id="fPreco" placeholder="Ex: 4.90" min="0.01" step="0.01">
+        </div>
+        <div class="form-grupo">
+          <label>Estoque *</label>
+          <input type="number" id="fEstoque" placeholder="Ex: 10" min="0">
+        </div>
+      </div>
+
+      <div class="form-grupo">
+        <label>Imagem (opcional)</label>
+        <div class="upload-area" onclick="document.getElementById('fImagem').click()">
+          <div>📷 Clique para selecionar imagem</div>
+          <div style="font-size:0.75rem;color:#888;margin-top:4px">JPG, PNG, WEBP</div>
+          <input type="file" id="fImagem" accept="image/*" onchange="previewImagem(event)">
+        </div>
+        <img id="imgPreview" class="upload-preview" alt="Preview">
+        <input type="hidden" id="fImagemBase64">
+      </div>
+
+      <button class="btn-salvar" onclick="salvarFigurinha()">✅ Salvar Figurinha</button>
+      <button class="btn-cancelar-edicao" id="btnCancelarEdicao" onclick="cancelarEdicao()">Cancelar edição</button>
+    </div>
+
+    <!-- LISTA -->
+    <div class="admin-lista-card">
+      <h3>
+        📋 Figurinhas Cadastradas
+        <span style="font-size:0.85rem;font-weight:600;color:#666;" id="listaContador"></span>
+      </h3>
+
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <input type="text" class="admin-search" id="adminSearch" placeholder="🔍 Buscar por nome, número ou grupo..." oninput="filtrarLista()" style="flex:1;min-width:180px;">
+        <select id="adminFiltroGrupo" style="padding:9px 12px;border:2px solid #e0e0e0;border-radius:8px;font-size:0.88rem;font-family:inherit;" onchange="filtrarLista()">
+          <option value="">Todos os grupos</option>
+          <option value="A">Grupo A</option>
+          <option value="B">Grupo B</option>
+          <option value="C">Grupo C</option>
+          <option value="D">Grupo D</option>
+          <option value="E">Grupo E</option>
+          <option value="F">Grupo F</option>
+          <option value="G">Grupo G</option>
+          <option value="H">Grupo H</option>
+          <option value="ESPECIAL">Especiais</option>
+          <option value="LENDAS">Lendas</option>
+          <option value="SELEÇÃO">Seleção</option>
+        </select>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="admin-tabela">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nome</th>
+              <th>Grupo</th>
+              <th>Preço</th>
+              <th>Estoque</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="adminTabela">
+            <!-- Carregado via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div id="listaVazia" style="display:none;text-align:center;padding:40px;color:#666;">
+        <div style="font-size:2.5rem;margin-bottom:12px">📋</div>
+        <p>Nenhuma figurinha encontrada.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AÇÕES DE DADOS -->
+  <div style="max-width:1100px;margin:30px auto;background:white;border-radius:12px;padding:24px;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+    <h3 style="font-size:1rem;font-weight:800;color:#333;margin-bottom:16px;">⚠️ Gerenciamento de Dados</h3>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <button onclick="exportarDados()" style="padding:10px 20px;background:#e3f2fd;color:#003087;border-radius:8px;font-weight:700;font-size:0.85rem;transition:background 0.3s;" onmouseover="this.style.background='#bbdefb'" onmouseout="this.style.background='#e3f2fd'">
+        📤 Exportar JSON
+      </button>
+      <button onclick="document.getElementById('importInput').click()" style="padding:10px 20px;background:#e8f5e9;color:#006633;border-radius:8px;font-weight:700;font-size:0.85rem;transition:background 0.3s;" onmouseover="this.style.background='#c8e6c9'" onmouseout="this.style.background='#e8f5e9'">
+        📥 Importar JSON
+      </button>
+      <input type="file" id="importInput" accept=".json" style="display:none" onchange="importarDados(event)">
+      <button onclick="confirmarLimparTudo()" style="padding:10px 20px;background:#ffeaea;color:#e53935;border-radius:8px;font-weight:700;font-size:0.85rem;transition:background 0.3s;" onmouseover="this.style.background='#ffcdd2'" onmouseout="this.style.background='#ffeaea'">
+        🗑️ Limpar Todos os Dados
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- MODAL EXCLUIR -->
+<div class="modal-overlay" id="modalExcluir">
+  <div class="modal">
+    <h3>🗑️ Excluir Figurinha?</h3>
+    <p id="modalExcluirMsg">Esta ação não pode ser desfeita.</p>
+    <div class="modal-btns">
+      <button class="btn-cancelar-modal" onclick="fecharModalExcluir()">Cancelar</button>
+      <button class="btn-confirmar" onclick="confirmarExcluir()">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL LIMPAR TUDO -->
+<div class="modal-overlay" id="modalLimparTudo">
+  <div class="modal">
+    <h3>⚠️ Limpar todos os dados?</h3>
+    <p>Todas as figurinhas serão removidas permanentemente. Exporte um backup antes!</p>
+    <div class="modal-btns">
+      <button class="btn-cancelar-modal" onclick="fecharModalLimparTudo()">Cancelar</button>
+      <button class="btn-confirmar" onclick="executarLimparTudo()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>⚽ <strong>Figurinha da Copa 2K26</strong> — Painel Administrativo</p>
+</footer>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="script.js"></script>
+<script>
+let idParaExcluir = null;
+
+function initPagina() {
+  atualizarStats();
+  renderizarTabela(getDB());
+}
+
+function atualizarStats() {
+  const db = getDB();
+  const grupos = [...new Set(db.map(f => f.grupo))];
+  document.getElementById('admTotal').textContent = db.length;
+  document.getElementById('admDisponiveis').textContent = db.filter(f => f.estoque > 0).length;
+  document.getElementById('admEsgotados').textContent = db.filter(f => f.estoque <= 0).length;
+  document.getElementById('admGrupos').textContent = grupos.length;
+}
+
+function salvarFigurinha() {
+  const id = document.getElementById('editId').value;
+  const numero = document.getElementById('fNumero').value.trim();
+  const grupo = document.getElementById('fGrupo').value;
+  const nome = document.getElementById('fNome').value.trim();
+  const descricao = document.getElementById('fDescricao').value.trim();
+  const preco = document.getElementById('fPreco').value;
+  const estoque = document.getElementById('fEstoque').value;
+  const imagem = document.getElementById('fImagemBase64').value;
+
+  if (!numero || !grupo || !nome || !preco || estoque === '') {
+    showToast('Preencha todos os campos obrigatórios!', 'erro');
+    return;
+  }
+
+  const db = getDB();
+
+  if (id) {
+    // Editar
+    const idx = db.findIndex(f => f.id === id);
+    if (idx >= 0) {
+      db[idx] = { ...db[idx], numero: Number(numero), grupo, nome, descricao, preco: Number(preco), estoque: Number(estoque), imagem };
+      showToast('Figurinha atualizada!');
+    }
+  } else {
+    // Verificar número duplicado
+    if (db.find(f => String(f.numero) === numero && f.grupo === grupo)) {
+      showToast(`Já existe figurinha #${numero} no ${GRUPOS_NOMES[grupo] || grupo}!`, 'erro');
+      return;
+    }
+
+    const nova = {
+      id: Date.now().toString(),
+      numero: Number(numero),
+      grupo,
+      nome,
+      descricao,
+      preco: Number(preco),
+      estoque: Number(estoque),
+      imagem
+    };
+    db.push(nova);
+    showToast('Figurinha cadastrada com sucesso!');
+  }
+
+  saveDB(db);
+  cancelarEdicao();
+  atualizarStats();
+  filtrarLista();
+}
+
+function editarFigurinha(id) {
+  const db = getDB();
+  const fig = db.find(f => f.id === id);
+  if (!fig) return;
+
+  document.getElementById('editId').value = fig.id;
+  document.getElementById('fNumero').value = fig.numero;
+  document.getElementById('fGrupo').value = fig.grupo;
+  document.getElementById('fNome').value = fig.nome;
+  document.getElementById('fDescricao').value = fig.descricao || '';
+  document.getElementById('fPreco').value = fig.preco;
+  document.getElementById('fEstoque').value = fig.estoque;
+  document.getElementById('fImagemBase64').value = fig.imagem || '';
+
+  const preview = document.getElementById('imgPreview');
+  if (fig.imagem) {
+    preview.src = fig.imagem;
+    preview.classList.add('visivel');
+  } else {
+    preview.classList.remove('visivel');
+  }
+
+  document.getElementById('formTitulo').textContent = '✏️ Editar Figurinha';
+  document.getElementById('btnCancelarEdicao').classList.add('visivel');
+
+  // Scroll para o form
+  document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function cancelarEdicao() {
+  document.getElementById('editId').value = '';
+  document.getElementById('fNumero').value = '';
+  document.getElementById('fGrupo').value = '';
+  document.getElementById('fNome').value = '';
+  document.getElementById('fDescricao').value = '';
+  document.getElementById('fPreco').value = '';
+  document.getElementById('fEstoque').value = '';
+  document.getElementById('fImagemBase64').value = '';
+  document.getElementById('imgPreview').classList.remove('visivel');
+  document.getElementById('formTitulo').textContent = '➕ Nova Figurinha';
+  document.getElementById('btnCancelarEdicao').classList.remove('visivel');
+}
+
+function abrirModalExcluir(id, nome) {
+  idParaExcluir = id;
+  document.getElementById('modalExcluirMsg').textContent = `Deseja excluir "${nome}"? Esta ação não pode ser desfeita.`;
+  document.getElementById('modalExcluir').classList.add('aberto');
+}
+
+function fecharModalExcluir() {
+  idParaExcluir = null;
+  document.getElementById('modalExcluir').classList.remove('aberto');
+}
+
+function confirmarExcluir() {
+  if (!idParaExcluir) return;
+  const db = getDB().filter(f => f.id !== idParaExcluir);
+  saveDB(db);
+  fecharModalExcluir();
+  showToast('Figurinha excluída.', 'info');
+  atualizarStats();
+  filtrarLista();
+}
+
+function filtrarLista() {
+  const busca = (document.getElementById('adminSearch').value || '').toLowerCase();
+  const grupo = document.getElementById('adminFiltroGrupo').value;
+  const db = getDB();
+
+  const lista = db.filter(f => {
+    if (grupo && f.grupo !== grupo) return false;
+    if (busca) {
+      return f.nome.toLowerCase().includes(busca) ||
+        String(f.numero).includes(busca) ||
+        f.grupo.toLowerCase().includes(busca);
+    }
+    return true;
+  }).sort((a, b) => Number(a.numero) - Number(b.numero));
+
+  document.getElementById('listaContador').textContent = `(${lista.length} de ${db.length})`;
+  renderizarTabela(lista);
+}
+
+function renderizarTabela(lista) {
+  const tbody = document.getElementById('adminTabela');
+  const vazia = document.getElementById('listaVazia');
+
+  if (lista.length === 0) {
+    tbody.innerHTML = '';
+    vazia.style.display = 'block';
+    return;
+  }
+
+  vazia.style.display = 'none';
+  tbody.innerHTML = lista.map(fig => `
+    <tr>
+      <td style="font-weight:700;color:#333">#${String(fig.numero).padStart(3,'0')}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          ${fig.imagem ? `<img src="${fig.imagem}" style="width:32px;height:32px;border-radius:6px;object-fit:cover;">` : '<div style="width:32px;height:32px;border-radius:6px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:1rem">⚽</div>'}
+          <span style="font-weight:600">${fig.nome}</span>
+        </div>
+      </td>
+      <td><span class="tag-grupo">${GRUPOS_NOMES[fig.grupo] || fig.grupo}</span></td>
+      <td style="font-weight:700;color:#006633">${formatarPreco(fig.preco)}</td>
+      <td>
+        <span class="${fig.estoque > 0 ? 'status-disponivel' : 'status-esgotado'}">
+          ${fig.estoque > 0 ? fig.estoque + ' un.' : 'Esgotado'}
+        </span>
+      </td>
+      <td>
+        <div class="admin-acoes">
+          <button class="btn-editar" onclick="editarFigurinha('${fig.id}')">✏️ Editar</button>
+          <button class="btn-excluir" onclick="abrirModalExcluir('${fig.id}', '${fig.nome.replace(/'/g, "\\'")}')">🗑️ Excluir</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function previewImagem(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    const base64 = e.target.result;
+    document.getElementById('fImagemBase64').value = base64;
+    const preview = document.getElementById('imgPreview');
+    preview.src = base64;
+    preview.classList.add('visivel');
+  };
+  reader.readAsDataURL(file);
+}
+
+function exportarDados() {
+  const db = getDB();
+  const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'figurinhas_copa2k26_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  showToast('Dados exportados com sucesso!');
+}
+
+function importarDados(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const dados = JSON.parse(e.target.result);
+      if (!Array.isArray(dados)) throw new Error('Formato inválido');
+      saveDB(dados);
+      atualizarStats();
+      filtrarLista();
+      showToast(`${dados.length} figurinhas importadas!`);
+    } catch {
+      showToast('Erro ao importar: arquivo inválido.', 'erro');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function confirmarLimparTudo() {
+  document.getElementById('modalLimparTudo').classList.add('aberto');
+}
+
+function fecharModalLimparTudo() {
+  document.getElementById('modalLimparTudo').classList.remove('aberto');
+}
+
+function executarLimparTudo() {
+  saveDB([]);
+  fecharModalLimparTudo();
+  atualizarStats();
+  filtrarLista();
+  showToast('Todos os dados foram removidos.', 'info');
+}
+
+// Fechar modais clicando fora
+document.addEventListener('click', e => {
+  if (e.target.id === 'modalExcluir') fecharModalExcluir();
+  if (e.target.id === 'modalLimparTudo') fecharModalLimparTudo();
+});
+</script>
+
+<script>
+// ===== SISTEMA DE LOGIN =====
+const SENHA_KEY = 'admin_senha_copa2k26';
+const SESSION_KEY = 'admin_logado_copa2k26';
+
+// Senha padrão (pode ser alterada pelo usuário dentro do painel)
+const SENHA_PADRAO = 'copa2026';
+
+function verificarSenha() {
+  const input = document.getElementById('loginSenha').value;
+  const senhaAtual = localStorage.getItem(SENHA_KEY) || SENHA_PADRAO;
+  const erro = document.getElementById('loginErro');
+
+  if (input === senhaAtual) {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    document.getElementById('loginOverlay').style.display = 'none';
+    erro.style.display = 'none';
+    document.getElementById('loginSenha').value = '';
+  } else {
+    erro.style.display = 'block';
+    document.getElementById('loginSenha').value = '';
+    document.getElementById('loginSenha').focus();
+    // Animação de erro
+    const overlay = document.getElementById('loginOverlay').querySelector('div');
+    overlay.style.animation = 'shake 0.4s ease';
+    setTimeout(() => overlay.style.animation = '', 400);
+  }
+}
+
+function sair() {
+  sessionStorage.removeItem(SESSION_KEY);
+  location.reload();
+}
+
+function alterarSenha() {
+  const nova = prompt('Digite a nova senha (mínimo 4 caracteres):');
+  if (!nova) return;
+  if (nova.length < 4) { showToast('Senha muito curta! Mínimo 4 caracteres.', 'erro'); return; }
+  const confirma = prompt('Confirme a nova senha:');
+  if (nova !== confirma) { showToast('As senhas não coincidem!', 'erro'); return; }
+  localStorage.setItem(SENHA_KEY, nova);
+  showToast('Senha alterada com sucesso!');
+}
+
+// Verificar sessão ao carregar
+(function() {
+  if (!sessionStorage.getItem(SESSION_KEY)) {
+    document.getElementById('loginOverlay').style.display = 'flex';
+  } else {
+    document.getElementById('loginOverlay').style.display = 'none';
+  }
+})();
+
+// Animação shake no CSS inline
+const shakeStyle = document.createElement('style');
+shakeStyle.textContent = `
+  @keyframes shake {
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-10px)}
+    40%{transform:translateX(10px)}
+    60%{transform:translateX(-8px)}
+    80%{transform:translateX(8px)}
+  }
+`;
+document.head.appendChild(shakeStyle);
+</script>
+</body>
+</html>

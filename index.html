@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Figurinha da Copa 2K26</title>
+  <meta name="description" content="As melhores figurinhas da Copa do Mundo 2026. Grupos A ao H, lendas e especiais.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">⚽</div>
+      <div class="logo-text">
+        <h1>Figurinha da Copa</h1>
+        <span>2K26 Edition</span>
+      </div>
+    </a>
+
+    <nav id="navMenu">
+      <a href="index.html">Início</a>
+      <a href="index.html#album">Álbum</a>
+      <a href="catalogo.html">Catálogo</a>
+      <a href="carrinho.html" class="btn-carrinho">
+        🛒 Carrinho <span class="badge-carrinho">0</span>
+      </a>
+    </nav>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">⚽ Copa do Mundo 2026</div>
+    <h2>Monte seu álbum<br><span>completo!</span></h2>
+    <p>Figurinhas originais e exclusivas da Copa do Mundo 2026. Grupos A ao H, Lendas e Especiais. Entrega rápida para todo o Brasil!</p>
+    <div class="hero-btns">
+      <a href="catalogo.html" class="btn-primary">Ver Catálogo Completo</a>
+      <a href="carrinho.html" class="btn-secondary">Meu Carrinho 🛒</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar" id="statsBar">
+  <div class="stat-item">
+    <div class="num" id="statTotal">0</div>
+    <div class="label">Figurinhas</div>
+  </div>
+  <div class="stat-item">
+    <div class="num" id="statGrupos">0</div>
+    <div class="label">Grupos</div>
+  </div>
+  <div class="stat-item">
+    <div class="num" id="statDisponiveis">0</div>
+    <div class="label">Disponíveis</div>
+  </div>
+  <div class="stat-item">
+    <div class="num">🇧🇷</div>
+    <div class="label">Entrega Nacional</div>
+  </div>
+</div>
+
+<!-- DESTAQUES -->
+<section style="padding-top: 80px;">
+  <div class="section-header">
+    <h2>⭐ Figurinhas em Destaque</h2>
+    <p>As mais procuradas do momento</p>
+    <div class="linha"></div>
+  </div>
+  <div class="grid-figurinhas" id="gridDestaques">
+    <!-- Carregado via JS -->
+  </div>
+</section>
+
+<!-- ÁLBUM -->
+<section id="album" class="album-section">
+  <div class="section-header">
+    <h2>Álbum de Figurinhas</h2>
+    <p>Abra as páginas do álbum por grupo e veja seus jogadores favoritos em destaque.</p>
+    <div class="linha"></div>
+  </div>
+
+  <div class="album-grid" id="albumGrid">
+    <!-- Carregado via JS -->
+  </div>
+</section>
+
+<!-- POR QUE COMPRAR -->
+<section style="background: white; margin: 40px 0; padding: 60px 20px;">
+  <div class="section-header">
+    <h2>Por que comprar aqui?</h2>
+    <div class="linha"></div>
+  </div>
+
+  <div style="max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 28px; text-align: center;">
+    <div>
+      <div style="font-size: 2.5rem; margin-bottom: 12px;">🏆</div>
+      <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 6px; color: #004d26;">Figurinhas Originais</h3>
+      <p style="font-size: 0.85rem; color: #666;">Todas as figurinhas com qualidade premium, cores vivas e impressão nítida.</p>
+    </div>
+    <div>
+      <div style="font-size: 2.5rem; margin-bottom: 12px;">🚚</div>
+      <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 6px; color: #004d26;">Entrega Rápida</h3>
+      <p style="font-size: 0.85rem; color: #666;">Enviamos para todo o Brasil com segurança e agilidade.</p>
+    </div>
+    <div>
+      <div style="font-size: 2.5rem; margin-bottom: 12px;">💬</div>
+      <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 6px; color: #004d26;">Atendimento via WhatsApp</h3>
+      <p style="font-size: 0.85rem; color: #666;">Tire todas as suas dúvidas diretamente pelo WhatsApp.</p>
+    </div>
+    <div>
+      <div style="font-size: 2.5rem; margin-bottom: 12px;">🔒</div>
+      <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 6px; color: #004d26;">Compra Segura</h3>
+      <p style="font-size: 0.85rem; color: #666;">Seu pedido é confirmado somente após o pagamento verificado.</p>
+    </div>
+  </div>
+</section>
+
+<!-- GRUPOS RÁPIDOS -->
+<section>
+  <div class="section-header">
+    <h2>Explorar por Grupo</h2>
+    <p>Encontre as figurinhas do seu time favorito</p>
+    <div class="linha"></div>
+  </div>
+
+  <div id="gruposGrid" style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 14px;">
+    <!-- Carregado via JS -->
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>⚽ <strong>Figurinha da Copa 2K26</strong> — Todos os direitos reservados &copy; 2026</p>
+  <p style="margin-top: 6px; font-size: 0.78rem;">Figurinhas colecionáveis para fãs do futebol mundial</p>
+</footer>
+
+<!-- WHATSAPP -->
+<a href="https://wa.me/5511999999999?text=Olá! Tenho interesse nas figurinhas da Copa 2K26" class="whatsapp-float" target="_blank" title="Falar no WhatsApp">💬</a>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="script.js"></script>
+<script>
+function initPagina() {
+  seedDadosExemplo();
+  carregarStats();
+  carregarDestaques();
+  carregarAlbum();
+  carregarGrupos();
+}
+
+function carregarStats() {
+  const db = getDB();
+  const grupos = [...new Set(db.map(f => f.grupo))];
+  const disponiveis = db.filter(f => f.estoque > 0).length;
+
+  document.getElementById('statTotal').textContent = db.length;
+  document.getElementById('statGrupos').textContent = grupos.length;
+  document.getElementById('statDisponiveis').textContent = disponiveis;
+}
+
+function carregarDestaques() {
+  const db = getDB();
+  const grid = document.getElementById('gridDestaques');
+  if (!grid) return;
+
+  // Pegar até 8 figurinhas disponíveis como destaque
+  const destaques = db.filter(f => f.estoque > 0).slice(0, 8);
+
+  if (destaques.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">⚽</div>
+        <h3>Nenhuma figurinha cadastrada ainda</h3>
+        <p>Acesse o <a href="admin.html" style="color:#006633;font-weight:700">painel admin</a> para cadastrar figurinhas.</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = destaques.map(criarCardFigurinha).join('');
+}
+
+function carregarAlbum() {
+  const db = getDB();
+  const grid = document.getElementById('albumGrid');
+  if (!grid) return;
+
+  const grupos = [...new Set(db.map(f => f.grupo))].sort((a, b) => {
+    const ordem = ['A','B','C','D','E','F','G','H','SELEÇÃO','LENDAS','ESPECIAL'];
+    return ordem.indexOf(a) - ordem.indexOf(b);
+  });
+
+  if (grupos.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">📦</div>
+        <h3>O álbum ainda está vazio</h3>
+        <p>Cadastre figurinhas no <a href="admin.html" style="color:#006633;font-weight:700">painel admin</a> para preencher o álbum.</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = grupos.map(g => {
+    const itens = db.filter(f => f.grupo === g).slice(0, 4);
+    const titulo = GRUPOS_NOMES[g] || `Grupo ${g}`;
+    const existe = itens.length > 0;
+
+    return `
+      <div class="album-card">
+        <div class="album-card-header">
+          <h3>${titulo}</h3>
+          <p>${existe ? itens.length + ' figurinhas disponíveis' : 'Sem figurinhas cadastradas ainda'}</p>
+        </div>
+        <div class="album-card-body">
+          <div class="album-mini-grid">
+            ${itens.length > 0 ? itens.map(fig => criarMiniFigurinha(fig)).join('') : `<div class="album-mini-card" style="grid-column:1/-1;justify-content:center;background:#fff3e0;color:#b35a00;">+ Cadastre mais figurinhas</div>`}
+          </div>
+        </div>
+        <div class="album-card-footer">
+          <a href="catalogo.html?grupo=${g}">Abrir álbum ${titulo}</a>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function criarMiniFigurinha(fig) {
+  const imgHTML = fig.imagem
+    ? `<img src="${fig.imagem}" alt="${fig.nome}" loading="lazy">`
+    : `<div class="album-mini-avatar">${fig.nome.split(' ').map(p => p[0]).slice(0,2).join('')}</div>`;
+
+  return `
+    <div class="album-mini-card">
+      ${imgHTML}
+      <div class="album-mini-info">
+        <div class="album-mini-name">${fig.nome}</div>
+        <div class="album-mini-number">#${String(fig.numero).padStart(3,'0')}</div>
+      </div>
+    </div>`;
+}
+
+function carregarGrupos() {
+  const db = getDB();
+  const grid = document.getElementById('gruposGrid');
+  if (!grid) return;
+
+  const grupos = [...new Set(db.map(f => f.grupo))].sort();
+
+  if (grupos.length === 0) {
+    grid.innerHTML = '<p style="color:#666;text-align:center;grid-column:1/-1">Nenhum grupo cadastrado ainda.</p>';
+    return;
+  }
+
+  const cores = ['#006633','#003087','#c62828','#e65100','#4a148c','#00695c','#1565c0','#558b2f','#795548','#37474f'];
+
+  grid.innerHTML = grupos.map((g, i) => {
+    const qtd = db.filter(f => f.grupo === g).length;
+    const cor = cores[i % cores.length];
+    return `
+      <a href="catalogo.html?grupo=${g}" style="
+        background:${cor};
+        color:white;
+        border-radius:12px;
+        padding:20px 14px;
+        text-align:center;
+        font-weight:800;
+        font-size:1rem;
+        box-shadow:0 4px 15px rgba(0,0,0,0.15);
+        transition:transform 0.2s,box-shadow 0.2s;
+        display:block;
+      " onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 25px rgba(0,0,0,0.25)'"
+         onmouseout="this.style.transform='';this.style.boxShadow='0 4px 15px rgba(0,0,0,0.15)'">
+        <div style="font-size:1.4rem;margin-bottom:6px">⚽</div>
+        ${GRUPOS_NOMES[g] || 'Grupo ' + g}
+        <div style="font-size:0.75rem;opacity:0.8;margin-top:4px">${qtd} figurinha${qtd !== 1 ? 's' : ''}</div>
+      </a>`;
+  }).join('');
+}
+</script>
+</body>
+</html>

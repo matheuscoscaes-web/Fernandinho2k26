@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo — Figurinha da Copa 2K26</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">⚽</div>
+      <div class="logo-text">
+        <h1>Figurinha da Copa</h1>
+        <span>2K26 Edition</span>
+      </div>
+    </a>
+    <nav id="navMenu">
+      <a href="index.html">Início</a>
+      <a href="index.html#album">Álbum</a>
+      <a href="catalogo.html">Catálogo</a>
+      <a href="carrinho.html" class="btn-carrinho">
+        🛒 Carrinho <span class="badge-carrinho">0</span>
+      </a>
+    </nav>
+    <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- PÁGINA -->
+<section style="padding-top: 40px;">
+  <div class="section-header">
+    <h2>📚 Catálogo de Figurinhas</h2>
+    <p>Encontre as figurinhas que faltam no seu álbum</p>
+    <div class="linha"></div>
+  </div>
+
+  <!-- FILTROS -->
+  <div style="max-width: 1200px; margin: 0 auto 24px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+    <input type="text" id="searchInput" placeholder="🔍 Buscar figurinha pelo nome ou número..." style="
+      flex: 1; min-width: 200px; padding: 10px 16px; border: 2px solid #e0e0e0;
+      border-radius: 10px; font-size: 0.92rem; font-family: inherit; transition: border-color 0.3s;
+    " oninput="filtrarFigurinhas()" onfocus="this.style.borderColor='#006633'" onblur="this.style.borderColor='#e0e0e0'">
+
+    <select id="ordenarSelect" style="
+      padding: 10px 14px; border: 2px solid #e0e0e0; border-radius: 10px;
+      font-size: 0.9rem; font-family: inherit; background: white; cursor: pointer;
+    " onchange="filtrarFigurinhas()">
+      <option value="numero">Ordenar: Número</option>
+      <option value="nome">Ordenar: Nome A-Z</option>
+      <option value="preco_asc">Ordenar: Menor Preço</option>
+      <option value="preco_desc">Ordenar: Maior Preço</option>
+    </select>
+
+    <label style="display:flex;align-items:center;gap:8px;font-size:0.88rem;font-weight:600;color:#444;cursor:pointer;">
+      <input type="checkbox" id="somenteDisponiveis" onchange="filtrarFigurinhas()" style="width:16px;height:16px;accent-color:#006633">
+      Somente disponíveis
+    </label>
+  </div>
+
+  <!-- GRUPOS NAV -->
+  <div class="grupos-nav" id="gruposNav">
+    <button class="btn-grupo ativo" data-grupo="TODOS" onclick="selecionarGrupo('TODOS', this)">
+      Todos
+    </button>
+    <!-- Grupos carregados via JS -->
+  </div>
+
+  <!-- CONTADOR -->
+  <div style="max-width:1200px;margin:0 auto 16px;font-size:0.85rem;color:#666;" id="contador"></div>
+
+  <!-- GRID -->
+  <div class="grid-figurinhas" id="gridCatalogo">
+    <!-- Carregado via JS -->
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>⚽ <strong>Figurinha da Copa 2K26</strong> — Todos os direitos reservados &copy; 2026</p>
+</footer>
+
+<a href="https://wa.me/5511999999999?text=Olá! Tenho interesse nas figurinhas da Copa 2K26" class="whatsapp-float" target="_blank" title="Falar no WhatsApp">💬</a>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="script.js"></script>
+<script>
+let grupoAtivo = 'TODOS';
+
+function initPagina() {
+  seedDadosExemplo();
+
+  // Verificar parâmetro de grupo na URL
+  const params = new URLSearchParams(window.location.search);
+  const grupoParam = params.get('grupo');
+  if (grupoParam) grupoAtivo = grupoParam;
+
+  carregarGruposNav();
+  filtrarFigurinhas();
+}
+
+function carregarGruposNav() {
+  const db = getDB();
+  const nav = document.getElementById('gruposNav');
+  const grupos = [...new Set(db.map(f => f.grupo))].sort();
+
+  const btnsGrupos = grupos.map(g => {
+    const qtd = db.filter(f => f.grupo === g).length;
+    const ativo = grupoAtivo === g ? 'ativo' : '';
+    return `<button class="btn-grupo ${ativo}" data-grupo="${g}" onclick="selecionarGrupo('${g}', this)">
+      ${GRUPOS_NOMES[g] || 'Grupo ' + g} <small style="opacity:0.7">(${qtd})</small>
+    </button>`;
+  }).join('');
+
+  // Resetar botão "Todos"
+  const btnTodos = nav.querySelector('[data-grupo="TODOS"]');
+  if (btnTodos) {
+    btnTodos.className = 'btn-grupo' + (grupoAtivo === 'TODOS' ? ' ativo' : '');
+  }
+
+  // Inserir após o botão "Todos"
+  const todosBtn = nav.querySelector('[data-grupo="TODOS"]');
+  if (todosBtn) {
+    todosBtn.insertAdjacentHTML('afterend', btnsGrupos);
+  }
+}
+
+function selecionarGrupo(grupo, btn) {
+  grupoAtivo = grupo;
+  document.querySelectorAll('.btn-grupo').forEach(b => b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+  filtrarFigurinhas();
+}
+
+function filtrarFigurinhas() {
+  const db = getDB();
+  const busca = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+  const ordem = document.getElementById('ordenarSelect').value;
+  const somenteDispo = document.getElementById('somenteDisponiveis').checked;
+
+  let lista = db.filter(f => {
+    if (grupoAtivo !== 'TODOS' && f.grupo !== grupoAtivo) return false;
+    if (somenteDispo && f.estoque <= 0) return false;
+    if (busca) {
+      const numStr = String(f.numero).padStart(3, '0');
+      return f.nome.toLowerCase().includes(busca) || numStr.includes(busca) || f.grupo.toLowerCase().includes(busca);
+    }
+    return true;
+  });
+
+  // Ordenar
+  if (ordem === 'numero') lista.sort((a, b) => Number(a.numero) - Number(b.numero));
+  else if (ordem === 'nome') lista.sort((a, b) => a.nome.localeCompare(b.nome));
+  else if (ordem === 'preco_asc') lista.sort((a, b) => Number(a.preco) - Number(b.preco));
+  else if (ordem === 'preco_desc') lista.sort((a, b) => Number(b.preco) - Number(a.preco));
+
+  const grid = document.getElementById('gridCatalogo');
+  const contador = document.getElementById('contador');
+
+  if (lista.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">🔍</div>
+        <h3>Nenhuma figurinha encontrada</h3>
+        <p>Tente outros filtros ou <a href="admin.html" style="color:#006633;font-weight:700">cadastre novas figurinhas</a>.</p>
+      </div>`;
+    contador.textContent = '';
+    return;
+  }
+
+  contador.textContent = `Exibindo ${lista.length} figurinha${lista.length !== 1 ? 's' : ''}`;
+  grid.innerHTML = lista.map(criarCardFigurinha).join('');
+}
+</script>
+</body>
+</html>

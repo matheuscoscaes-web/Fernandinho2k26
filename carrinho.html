@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrinho — Figurinha da Copa 2K26</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">⚽</div>
+      <div class="logo-text">
+        <h1>Figurinha da Copa</h1>
+        <span>2K26 Edition</span>
+      </div>
+    </a>
+    <nav id="navMenu">
+      <a href="index.html">Início</a>
+      <a href="catalogo.html">Catálogo</a>
+      <a href="carrinho.html" class="btn-carrinho">
+        🛒 Carrinho <span class="badge-carrinho">0</span>
+      </a>
+    </nav>
+    <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<section>
+  <div class="section-header">
+    <h2>🛒 Meu Carrinho</h2>
+    <p>Revise seus itens antes de finalizar</p>
+    <div class="linha"></div>
+  </div>
+  <div class="carrinho-layout" id="carrinhoLayout"></div>
+</section>
+
+<!-- MODAL LIMPAR -->
+<div class="modal-overlay" id="modalLimpar">
+  <div class="modal">
+    <h3>🗑️ Limpar carrinho?</h3>
+    <p>Todos os itens serão removidos. Essa ação não pode ser desfeita.</p>
+    <div class="modal-btns">
+      <button class="btn-cancelar-modal" onclick="fecharModalLimpar()">Cancelar</button>
+      <button class="btn-confirmar" onclick="confirmarLimpar()">Sim, limpar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CHECKOUT — coleta dados do cliente -->
+<div class="modal-overlay" id="modalCheckout" style="align-items:flex-start;padding-top:40px;overflow-y:auto;">
+  <div class="modal" style="max-width:520px;text-align:left;padding:32px 28px;">
+    <h3 style="text-align:center;margin-bottom:4px;">📦 Finalizar Pedido</h3>
+    <p style="text-align:center;color:#888;font-size:0.88rem;margin-bottom:24px;">Preencha seus dados para entrega</p>
+
+    <div style="margin-bottom:14px;">
+      <label style="display:block;font-size:0.8rem;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Nome completo *</label>
+      <input id="ckNome" type="text" placeholder="Ex: João da Silva" style="width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:0.92rem;font-family:inherit;transition:border-color 0.3s;" onfocus="this.style.borderColor='#006633'" onblur="this.style.borderColor='#e0e0e0'">
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <label style="display:block;font-size:0.8rem;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">WhatsApp / Telefone *</label>
+      <input id="ckTelefone" type="tel" placeholder="Ex: 11999999999" style="width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:0.92rem;font-family:inherit;transition:border-color 0.3s;" onfocus="this.style.borderColor='#006633'" onblur="this.style.borderColor='#e0e0e0'">
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <label style="display:block;font-size:0.8rem;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Endereço de entrega *</label>
+      <input id="ckEndereco" type="text" placeholder="Rua, número, bairro, cidade/UF" style="width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:0.92rem;font-family:inherit;transition:border-color 0.3s;" onfocus="this.style.borderColor='#006633'" onblur="this.style.borderColor='#e0e0e0'">
+    </div>
+
+    <div style="margin-bottom:6px;">
+      <label style="display:block;font-size:0.8rem;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Observações</label>
+      <textarea id="ckObs" placeholder="Horário preferido, ponto de referência, etc." rows="2" style="width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:0.88rem;font-family:inherit;resize:vertical;transition:border-color 0.3s;" onfocus="this.style.borderColor='#006633'" onblur="this.style.borderColor='#e0e0e0'"></textarea>
+    </div>
+
+    <!-- Resumo rápido -->
+    <div id="ckResumo" style="background:#f4f4f4;border-radius:8px;padding:14px;margin:16px 0;font-size:0.88rem;"></div>
+
+    <div id="ckErro" style="color:#e53935;font-size:0.84rem;font-weight:600;margin-bottom:10px;display:none;">⚠️ Preencha todos os campos obrigatórios.</div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button onclick="fecharCheckout()" style="flex:1;padding:12px;background:#f0f0f0;color:#444;border-radius:8px;font-weight:700;border:none;cursor:pointer;">Voltar</button>
+      <button onclick="confirmarPedido()" style="flex:2;padding:12px;background:#006633;color:white;border-radius:8px;font-weight:800;font-size:0.95rem;border:none;cursor:pointer;transition:background 0.3s;" onmouseover="this.style.background='#004d26'" onmouseout="this.style.background='#006633'">
+        ✅ Confirmar Pedido
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUCESSO -->
+<div class="modal-overlay" id="modalSucesso">
+  <div class="modal" style="text-align:center;">
+    <div style="font-size:3.5rem;margin-bottom:12px;">🎉</div>
+    <h3 style="margin-bottom:8px;">Pedido Realizado!</h3>
+    <p style="color:#666;margin-bottom:6px;" id="sucMsgNome"></p>
+    <p style="color:#666;font-size:0.88rem;margin-bottom:20px;">Entraremos em contato pelo WhatsApp para confirmar pagamento e entrega.</p>
+    <div id="sucNumero" style="background:#d1fae5;color:#065f46;font-weight:800;font-size:1rem;padding:10px 18px;border-radius:8px;display:inline-block;margin-bottom:20px;"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+      <button onclick="fecharSucesso()" style="padding:11px 22px;background:#f0f0f0;color:#444;border-radius:8px;font-weight:700;border:none;cursor:pointer;">Fechar</button>
+      <a id="sucWaLink" href="#" target="_blank" style="padding:11px 22px;background:#25D366;color:white;border-radius:8px;font-weight:700;font-size:0.88rem;display:flex;align-items:center;gap:6px;">
+        💬 Confirmar no WhatsApp
+      </a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>⚽ <strong>Figurinha da Copa 2K26</strong> — Todos os direitos reservados &copy; 2026</p>
+</footer>
+
+<a href="https://wa.me/5511999999999?text=Olá! Tenho interesse nas figurinhas da Copa 2K26" class="whatsapp-float" target="_blank">💬</a>
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="script.js"></script>
+<script>
+const FRETE = 8.00;
+let _snapshotCarrinho = [];
+
+function initPagina() { renderizarCarrinho(); }
+
+function renderizarCarrinho() {
+  const carrinho = getCarrinho();
+  const db       = getDB();
+  const layout   = document.getElementById('carrinhoLayout');
+
+  if (carrinho.length === 0) {
+    layout.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:80px 20px;">
+        <div style="font-size:4rem;margin-bottom:16px">🛒</div>
+        <h3 style="font-size:1.4rem;font-weight:800;margin-bottom:8px;color:#333">Seu carrinho está vazio</h3>
+        <p style="color:#666;margin-bottom:28px">Adicione figurinhas para continuar</p>
+        <a href="catalogo.html" class="btn-primary" style="display:inline-block">Ver Catálogo</a>
+      </div>`;
+    return;
+  }
+
+  let subtotal = 0;
+  const itensHTML = carrinho.map(item => {
+    const fig = db.find(f => f.id === item.id);
+    if (!fig) return '';
+    const precoItem = Number(fig.preco) * item.qtd;
+    subtotal += precoItem;
+    const imgHTML = fig.imagem ? `<img src="${fig.imagem}" alt="${fig.nome}">` : '⚽';
+    return `
+      <div class="item-carrinho">
+        <div class="item-carrinho-img">${imgHTML}</div>
+        <div class="item-carrinho-info">
+          <h4>${fig.nome}</h4>
+          <p>Grupo ${fig.grupo} • #${String(fig.numero).padStart(3,'0')} • ${formatarPreco(fig.preco)} cada</p>
+        </div>
+        <div class="item-carrinho-controles">
+          <button class="qty-btn" onclick="alterarQtd('${fig.id}',-1)">−</button>
+          <span class="qty-num">${item.qtd}</span>
+          <button class="qty-btn" onclick="alterarQtd('${fig.id}',1)">+</button>
+        </div>
+        <span class="item-preco">${formatarPreco(precoItem)}</span>
+        <button class="btn-remover" onclick="removerItem('${fig.id}')">✕</button>
+      </div>`;
+  }).join('');
+
+  const total = subtotal + FRETE;
+  layout.innerHTML = `
+    <div class="carrinho-lista">${itensHTML}</div>
+    <div class="resumo-pedido">
+      <h3>Resumo do Pedido</h3>
+      <div class="resumo-linha"><span>Subtotal (${carrinho.reduce((s,i)=>s+i.qtd,0)} itens)</span><span>${formatarPreco(subtotal)}</span></div>
+      <div class="resumo-linha"><span>Frete</span><span>${formatarPreco(FRETE)}</span></div>
+      <div class="resumo-linha total"><span>Total</span><span>${formatarPreco(total)}</span></div>
+      <button class="btn-finalizar" onclick="abrirCheckout()">✅ Finalizar Pedido</button>
+      <button class="btn-limpar" onclick="document.getElementById('modalLimpar').classList.add('aberto')">🗑️ Limpar carrinho</button>
+    </div>`;
+}
+
+function alterarQtd(id, delta) {
+  const carrinho = getCarrinho();
+  const fig      = getDB().find(f => f.id === id);
+  const idx      = carrinho.findIndex(i => i.id === id);
+  if (idx < 0) return;
+  carrinho[idx].qtd += delta;
+  if (carrinho[idx].qtd <= 0) { carrinho.splice(idx, 1); }
+  else if (fig && carrinho[idx].qtd > fig.estoque) { showToast('Quantidade máxima disponível!','info'); carrinho[idx].qtd = fig.estoque; }
+  saveCarrinho(carrinho);
+  atualizarBadgeCarrinho();
+  renderizarCarrinho();
+}
+
+function removerItem(id) {
+  saveCarrinho(getCarrinho().filter(i => i.id !== id));
+  atualizarBadgeCarrinho();
+  showToast('Item removido.','info');
+  renderizarCarrinho();
+}
+
+function fecharModalLimpar() { document.getElementById('modalLimpar').classList.remove('aberto'); }
+
+function confirmarLimpar() {
+  saveCarrinho([]);
+  atualizarBadgeCarrinho();
+  fecharModalLimpar();
+  showToast('Carrinho limpo!','info');
+  renderizarCarrinho();
+}
+
+function abrirCheckout() {
+  const carrinho = getCarrinho();
+  const db       = getDB();
+  _snapshotCarrinho = [...carrinho];
+
+  let sub = 0;
+  const linhas = carrinho.map(item => {
+    const fig = db.find(f => f.id === item.id);
+    if (!fig) return '';
+    sub += Number(fig.preco) * item.qtd;
+    return `<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>${fig.nome} ×${item.qtd}</span><span style="font-weight:700">${formatarPreco(Number(fig.preco)*item.qtd)}</span></div>`;
+  }).join('');
+
+  document.getElementById('ckResumo').innerHTML = linhas +
+    `<div style="border-top:1px solid #ddd;margin-top:8px;padding-top:8px;display:flex;justify-content:space-between;"><span>Frete</span><span>${formatarPreco(FRETE)}</span></div>
+     <div style="display:flex;justify-content:space-between;font-weight:800;color:#006633;font-size:1rem;margin-top:4px;"><span>Total</span><span>${formatarPreco(sub+FRETE)}</span></div>`;
+
+  document.getElementById('ckErro').style.display = 'none';
+  document.getElementById('modalCheckout').classList.add('aberto');
+}
+
+function fecharCheckout() { document.getElementById('modalCheckout').classList.remove('aberto'); }
+
+function confirmarPedido() {
+  const nome     = document.getElementById('ckNome').value.trim();
+  const telefone = document.getElementById('ckTelefone').value.trim();
+  const endereco = document.getElementById('ckEndereco').value.trim();
+  const obs      = document.getElementById('ckObs').value.trim();
+
+  if (!nome || !telefone || !endereco) {
+    document.getElementById('ckErro').style.display = 'block';
+    return;
+  }
+
+  const pedido = salvarPedido({ nome, telefone, endereco, obs }, _snapshotCarrinho, FRETE);
+  saveCarrinho([]);
+  atualizarBadgeCarrinho();
+  fecharCheckout();
+
+  // Montar link WhatsApp com detalhes
+  const linhasWa = pedido.itens.map(i => `• ${i.nome} ×${i.qtd} = ${formatarPreco(i.subtotal)}`).join('%0A');
+  const waText = encodeURIComponent(
+    `Olá! Fiz um pedido na Figurinha da Copa 2K26.\n\n` +
+    `📋 Pedido: ${pedido.id}\n` +
+    `👤 Nome: ${nome}\n` +
+    `📍 Endereço: ${endereco}\n\n` +
+    `Itens:\n` + pedido.itens.map(i => `• ${i.nome} ×${i.qtd} = ${formatarPreco(i.subtotal)}`).join('\n') + `\n\n` +
+    `💰 Total: ${formatarPreco(pedido.total)}`
+  );
+
+  document.getElementById('sucMsgNome').textContent = `Obrigado, ${nome}! Seu pedido foi registrado.`;
+  document.getElementById('sucNumero').textContent  = `Pedido #${pedido.id}`;
+  document.getElementById('sucWaLink').href = `https://wa.me/5511999999999?text=${waText}`;
+  document.getElementById('modalSucesso').classList.add('aberto');
+
+  // Limpar campos
+  ['ckNome','ckTelefone','ckEndereco','ckObs'].forEach(id => { document.getElementById(id).value = ''; });
+}
+
+function fecharSucesso() {
+  document.getElementById('modalSucesso').classList.remove('aberto');
+  renderizarCarrinho();
+}
+
+document.addEventListener('click', e => {
+  if (e.target.id === 'modalLimpar')    fecharModalLimpar();
+  if (e.target.id === 'modalCheckout')  fecharCheckout();
+  if (e.target.id === 'modalSucesso')   fecharSucesso();
+});
+</script>
+</body>
+</html>
