@@ -150,10 +150,12 @@
 <!-- TOAST -->
 <div class="toast-container" id="toastContainer"></div>
 
+<script src="api.js"></script>
 <script src="script.js"></script>
 <script>
-function initPagina() {
-  seedDadosExemplo();
+async function initPagina() {
+  showLoading('gridDestaques');
+  await refreshDB();
   carregarStats();
   carregarDestaques();
   carregarAlbum();

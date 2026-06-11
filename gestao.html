@@ -359,6 +359,7 @@
 
 <div class="toast-container" id="toastContainer"></div>
 
+<script src="api.js"></script>
 <script src="script.js"></script>
 <script>
 // ===== LOGIN =====
@@ -403,15 +404,14 @@ function trocarTab(id, btn) {
 }
 
 // ===== INIT =====
-function inicializarCRM() {
-  seedDadosExemplo();
-  seedPedidosExemplo();
+async function inicializarCRM() {
+  await refreshAll();
   renderDashboard();
   popularSelectGrupos();
 }
 
-function initPagina() {
-  if (sessionStorage.getItem(SESSION_KEY)) inicializarCRM();
+async function initPagina() {
+  if (sessionStorage.getItem(SESSION_KEY)) await inicializarCRM();
 }
 
 // ===== HELPERS =====
@@ -609,12 +609,9 @@ function renderPedidos() {
     </tr>`).join('');
 }
 
-function alterarStatus(id, novoStatus) {
-  const orders = getOrders();
-  const idx    = orders.findIndex(o => o.id === id);
-  if (idx < 0) return;
-  orders[idx].status = novoStatus;
-  saveOrders(orders);
+async function alterarStatus(id, novoStatus) {
+  await apiUpdateStatus(id, novoStatus);
+  await refreshOrders();
   showToast(`Status atualizado: ${STATUS_INFO[novoStatus].label}`);
   renderDashboard();
 }
@@ -876,15 +873,13 @@ function renderEstoque() {
     </div>`).join('');
 }
 
-function reporEstoque(id) {
+async function reporEstoque(id) {
   const qtd = Number(document.getElementById('rep_'+id)?.value || 1);
   if (!qtd || qtd < 1) return;
-  const db  = getDB();
-  const idx = db.findIndex(f => f.id === id);
-  if (idx < 0) return;
-  db[idx].estoque += qtd;
-  saveDB(db);
-  showToast(`+${qtd} unidades adicionadas para ${db[idx].nome}!`);
+  const fig = getDB().find(f => f.id === id);
+  await apiReporEstoque(id, qtd);
+  await refreshDB();
+  showToast(`+${qtd} unidades adicionadas para ${fig?.nome || 'figurinha'}!`);
   renderEstoque();
   renderDashboard();
 }

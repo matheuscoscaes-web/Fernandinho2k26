@@ -116,12 +116,16 @@
 <a href="https://wa.me/5511999999999?text=Olá! Tenho interesse nas figurinhas da Copa 2K26" class="whatsapp-float" target="_blank">💬</a>
 <div class="toast-container" id="toastContainer"></div>
 
+<script src="api.js"></script>
 <script src="script.js"></script>
 <script>
 const FRETE = 8.00;
 let _snapshotCarrinho = [];
 
-function initPagina() { renderizarCarrinho(); }
+async function initPagina() {
+  await refreshDB();
+  renderizarCarrinho();
+}
 
 function renderizarCarrinho() {
   const carrinho = getCarrinho();

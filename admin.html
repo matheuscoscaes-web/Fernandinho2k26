@@ -281,13 +281,15 @@
 
 <div class="toast-container" id="toastContainer"></div>
 
+<script src="api.js"></script>
 <script src="script.js"></script>
 <script>
 let idParaExcluir = null;
 
-function initPagina() {
+async function initPagina() {
+  await refreshDB();
   atualizarStats();
-  renderizarTabela(getDB());
+  filtrarLista();
 }
 
 function atualizarStats() {
@@ -299,52 +301,39 @@ function atualizarStats() {
   document.getElementById('admGrupos').textContent = grupos.length;
 }
 
-function salvarFigurinha() {
-  const id = document.getElementById('editId').value;
-  const numero = document.getElementById('fNumero').value.trim();
-  const grupo = document.getElementById('fGrupo').value;
-  const nome = document.getElementById('fNome').value.trim();
-  const descricao = document.getElementById('fDescricao').value.trim();
-  const preco = document.getElementById('fPreco').value;
-  const estoque = document.getElementById('fEstoque').value;
-  const imagem = document.getElementById('fImagemBase64').value;
+async function salvarFigurinha() {
+  const id       = document.getElementById('editId').value;
+  const numero   = document.getElementById('fNumero').value.trim();
+  const grupo    = document.getElementById('fGrupo').value;
+  const nome     = document.getElementById('fNome').value.trim();
+  const descricao= document.getElementById('fDescricao').value.trim();
+  const preco    = document.getElementById('fPreco').value;
+  const estoque  = document.getElementById('fEstoque').value;
+  const imagem   = document.getElementById('fImagemBase64').value;
 
   if (!numero || !grupo || !nome || !preco || estoque === '') {
     showToast('Preencha todos os campos obrigatórios!', 'erro');
     return;
   }
 
-  const db = getDB();
+  const dados = { numero: Number(numero), grupo, nome, descricao, preco: Number(preco), estoque: Number(estoque), imagem };
 
   if (id) {
-    // Editar
-    const idx = db.findIndex(f => f.id === id);
-    if (idx >= 0) {
-      db[idx] = { ...db[idx], numero: Number(numero), grupo, nome, descricao, preco: Number(preco), estoque: Number(estoque), imagem };
-      showToast('Figurinha atualizada!');
-    }
+    const res = await apiUpdateFigurinha(id, dados);
+    if (res.erro) { showToast('Erro ao atualizar: ' + res.erro, 'erro'); return; }
+    showToast('Figurinha atualizada!');
   } else {
-    // Verificar número duplicado
+    const db = getDB();
     if (db.find(f => String(f.numero) === numero && f.grupo === grupo)) {
       showToast(`Já existe figurinha #${numero} no ${GRUPOS_NOMES[grupo] || grupo}!`, 'erro');
       return;
     }
-
-    const nova = {
-      id: Date.now().toString(),
-      numero: Number(numero),
-      grupo,
-      nome,
-      descricao,
-      preco: Number(preco),
-      estoque: Number(estoque),
-      imagem
-    };
-    db.push(nova);
+    const res = await apiCreateFigurinha({ id: Date.now().toString(), ...dados });
+    if (res.erro) { showToast('Erro ao criar: ' + res.erro, 'erro'); return; }
     showToast('Figurinha cadastrada com sucesso!');
   }
 
-  saveDB(db);
+  await refreshDB();
   cancelarEdicao();
   atualizarStats();
   filtrarLista();
@@ -404,10 +393,10 @@ function fecharModalExcluir() {
   document.getElementById('modalExcluir').classList.remove('aberto');
 }
 
-function confirmarExcluir() {
+async function confirmarExcluir() {
   if (!idParaExcluir) return;
-  const db = getDB().filter(f => f.id !== idParaExcluir);
-  saveDB(db);
+  await apiDeleteFigurinha(idParaExcluir);
+  await refreshDB();
   fecharModalExcluir();
   showToast('Figurinha excluída.', 'info');
   atualizarStats();
@@ -497,13 +486,13 @@ function exportarDados() {
 function importarDados(event) {
   const file = event.target.files[0];
   if (!file) return;
-
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async e => {
     try {
       const dados = JSON.parse(e.target.result);
       if (!Array.isArray(dados)) throw new Error('Formato inválido');
-      saveDB(dados);
+      for (const fig of dados) await apiCreateFigurinha(fig);
+      await refreshDB();
       atualizarStats();
       filtrarLista();
       showToast(`${dados.length} figurinhas importadas!`);
@@ -523,8 +512,10 @@ function fecharModalLimparTudo() {
   document.getElementById('modalLimparTudo').classList.remove('aberto');
 }
 
-function executarLimparTudo() {
-  saveDB([]);
+async function executarLimparTudo() {
+  const db = getDB();
+  for (const fig of db) await apiDeleteFigurinha(fig.id);
+  await refreshDB();
   fecharModalLimparTudo();
   atualizarStats();
   filtrarLista();

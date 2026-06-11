@@ -90,14 +90,15 @@
 
 <div class="toast-container" id="toastContainer"></div>
 
+<script src="api.js"></script>
 <script src="script.js"></script>
 <script>
 let grupoAtivo = 'TODOS';
 
-function initPagina() {
-  seedDadosExemplo();
+async function initPagina() {
+  showLoading('gridCatalogo');
+  await refreshDB();
 
-  // Verificar parâmetro de grupo na URL
   const params = new URLSearchParams(window.location.search);
   const grupoParam = params.get('grupo');
   if (grupoParam) grupoAtivo = grupoParam;
